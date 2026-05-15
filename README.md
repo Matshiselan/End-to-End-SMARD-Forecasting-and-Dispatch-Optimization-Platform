@@ -85,12 +85,22 @@ The main table `smard_market_data` includes:
 | ...                  | ...                       | ...                        |
 
 
+
 ### 3. Data Extraction (ETL)
 
 - Fetch and load SMARD data:
   ```bash
   python src/etl/fetch_smard.py
   ```
+
+**Note:**
+By default, the data extraction script fetches data for the period **May 2020 to May 2025**. This is controlled by the following line in `src/etl/fetch_smard.py`:
+
+```python
+target_timestamps = [ts for ts in available_timestamps if 1588284000000 <= ts <= 1746057600000]
+```
+
+You can adjust the date range by modifying the timestamp values in this line. The values represent milliseconds since epoch (Unix time). For other periods, update these values accordingly to fetch your desired date range.
 
 
 ### 4. Exploratory Data Analysis (EDA)
