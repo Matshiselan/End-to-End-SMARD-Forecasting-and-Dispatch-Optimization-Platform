@@ -1,0 +1,40 @@
+{
+  "name": "SMARD Forecasting Platform",
+  "image": "mcr.microsoft.com/devcontainers/python:3.12",
+  
+  "features": {
+    "ghcr.io/devcontainers/features/postgresql:1": {
+      "version": "16",
+      "postgresPassword": "postgres",
+      "postgresDB": "energy_db"
+    }
+  },
+
+  "postCreateCommand": "pip install -r requirements.txt",
+  
+  "forwardPorts": [5432],
+  "portsAttributes": {
+    "5432": {
+      "label": "PostgreSQL",
+      "onAutoForward": "silent"
+    }
+  },
+
+  "remoteEnv": {
+    "DB_HOST": "localhost",
+    "DB_USER": "postgres",
+    "DB_PASSWORD": "postgres",
+    "DB_NAME": "energy_db",
+    "DB_PORT": "5432"
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "mtxr.sqltools",
+        "mtxr.sqltools-driver-pg"
+      ]
+    }
+  }
+}
