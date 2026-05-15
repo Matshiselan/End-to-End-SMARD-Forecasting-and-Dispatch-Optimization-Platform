@@ -5,22 +5,10 @@
 
 A comprehensive platform for modeling, forecasting, and optimizing German energy production, consumption, and market prices using SMARD data.
 
-## Project Overview
 
-This platform enables:
-- Extraction and ETL of SMARD market data
-- Time series forecasting of generation, consumption, and prices
-- Exploratory data analysis (EDA) and feature engineering
-- Model training (LightGBM, LSTM, Transformers)
-- Dispatch optimization and scenario analysis
+## Overview
 
-## Features
-
-- Modular ETL pipeline for SMARD data
-- Flexible model training and evaluation scripts
-- Jupyter notebooks for EDA and visualization
-- Dockerized environment for reproducibility
-- Example database schema and connection instructions
+End-to-End SMARD Forecasting and Dispatch Optimization Platform is a comprehensive solution for modeling, forecasting, and optimizing German energy production, consumption, and market prices using SMARD data. The platform supports data extraction, feature engineering, model training, evaluation, and dispatch optimization in a modular, reproducible environment.
 
 ## Folder Structure
 
@@ -52,7 +40,9 @@ This platform enables:
 └── ...
 ```
 
-## Setup & Usage
+
+## Getting Started
+
 
 ### 1. Environment Setup
 
@@ -66,7 +56,8 @@ This platform enables:
   docker-compose up
   ```
 
-### 2. Database
+
+### 2. Database Setup
 
 - Ensure PostgreSQL is running (see docker-compose.yml or your local setup).
 - Connect to the database:
@@ -79,28 +70,7 @@ This platform enables:
   \d smard_market_data
   ```
 
-### 3. Data ETL
-
-- Fetch and load SMARD data:
-  ```bash
-  python src/etl/fetch_smard.py
-  ```
-
-### 4. Exploratory Data Analysis
-
-- Open and run the EDA notebook:
-  ```
-  notebooks/eda.ipynb
-  ```
-
-### 5. Model Training
-
-- Train models (example for LightGBM):
-  ```bash
-  python -m src.models.train_lgbm
-  ```
-
-## Example: Database Table Structure
+## Database Table Structure
 
 The main table `smard_market_data` includes:
 
@@ -113,6 +83,110 @@ The main table `smard_market_data` includes:
 | price_de_lu          | numeric(14,4)             | German/Lux price           |
 | proj_onshore         | numeric(14,4)             | Forecast onshore wind      |
 | ...                  | ...                       | ...                        |
+
+
+### 3. Data Extraction (ETL)
+
+- Fetch and load SMARD data:
+  ```bash
+  python src/etl/fetch_smard.py
+  ```
+
+
+### 4. Exploratory Data Analysis (EDA)
+
+- Open and run the EDA notebook:
+  ```
+  notebooks/eda.ipynb
+  ```
+
+
+---
+
+## Feature Engineering
+
+Feature engineering is handled in `src/models/features.py` via the `create_features(df)` function. This script:
+
+- Extracts temporal features (hour, day of week, month, quarter-hour)
+- Flags weekends and German public holidays
+- Adds daylight saving time (DST) indicator
+- Creates cyclical features (sine/cosine transforms for hour, day, month)
+- Computes domain features (total renewable generation, residual load)
+- Adds lagged features and rolling statistics (mean, std) for key variables
+- Calculates ramp rates (short-term changes)
+- Handles missing values with forward fill
+
+To customize or add features, edit `src/models/features.py`.
+
+---
+
+## Dataset Preparation
+
+The script `src/models/dataset.py` provides the `build_direct_dataset` function, which:
+
+- Selects features and target columns from the DataFrame
+- Scales features using `StandardScaler`
+- Constructs input sequences (X) and target sequences (Y) for time series models
+- Supports configurable sequence length and forecast horizon
+- Returns numpy arrays (float32) for efficient model training, along with timestamps and feature names
+
+This function is used by all model training scripts to prepare data for supervised learning.
+
+---
+
+## Modeling & Testing
+
+### 1. Model Training
+
+- LightGBM:
+  ```bash
+  python -m src.models.train_lgbm
+  ```
+- LSTM:
+  ```bash
+  python -m src.models.lstm
+  ```
+- Temporal Fusion Transformer (TFT):
+  ```bash
+  python -m src.models.train_tft
+  ```
+- CNN:
+  ```bash
+  python -m src.models.train_cnn
+  ```
+
+Each script supports configuration of target variable, forecast horizon, and other hyperparameters. Edit the script or pass arguments as needed.
+
+
+### 2. Model Evaluation
+
+- Evaluate model performance:
+  ```bash
+  python -m src.models.evaluate
+  ```
+- Backtest models:
+  ```bash
+  python -m src.models.backtest
+  ```
+
+
+### 3. Prediction
+
+- Generate predictions using a trained model:
+  ```bash
+  python -m src.models.predict
+  ```
+
+
+### 4. Testing
+
+- Unit tests can be added under a `tests/` directory (not included by default).
+- To test individual modules, run them as scripts or use pytest:
+  ```bash
+  pytest src/models/features.py
+  ```
+
+
 
 ## Contributing
 
