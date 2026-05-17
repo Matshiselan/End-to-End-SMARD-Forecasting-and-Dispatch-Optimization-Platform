@@ -205,6 +205,13 @@ Degradation-aware battery dispatch optimization is implemented in `src/optimizat
 
 See `notebooks/modelling.ipynb` for example usage and visualization.
 
+## LLM Report Writing
+To write the report we use a the Meta-Llama, run
+
+```
+python src/LLM/ollama.py
+```
+
 ---
 
 ## Contributing
