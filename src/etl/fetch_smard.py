@@ -71,7 +71,7 @@ def process_module(module):
         index_res.raise_for_status()
         available_timestamps = index_res.json().get('timestamps', [])
     except Exception as e:
-        print(f"❌ Failed to get index for {col_name}: {e}")
+        print(f"Failed to get index for {col_name}: {e}")
         return
 
     target_timestamps = [ts for ts in available_timestamps if 1588284000000 <= ts <= 1746057600000]
@@ -114,15 +114,15 @@ def process_module(module):
             
             conn.execute(text(f"DROP TABLE IF EXISTS {temp_table};"))
 
-        print(f"✅ Synced {col_name}: {len(df):,} rows")
+        print(f"Synced {col_name}: {len(df):,} rows")
         
     except Exception as e:
-        print(f"❌ Database error for {col_name}: {e}")
+        print(f"Database error for {col_name}: {e}")
 
 
 # ==========================
 if __name__ == "__main__":
-    print("🚀 Starting SMARD Data Fetch Pipeline...\n")
+    print("Starting SMARD Data Fetch Pipeline...\n")
 
     with ENGINE.begin() as conn:
         conn.execute(text("""
@@ -134,4 +134,4 @@ if __name__ == "__main__":
     with ThreadPoolExecutor(max_workers=2) as executor:
         executor.map(process_module, MODULE_MAP.keys())
 
-    print("\n🎉 SMARD data synchronization completed!")
+    print("\n SMARD data synchronization completed!")
