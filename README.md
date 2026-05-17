@@ -1,5 +1,12 @@
 
 ---
+<!-- Badges -->
+![Build Status](https://img.shields.io/github/actions/workflow/status/Matshiselan/End-to-End-SMARD-Forecasting-and-Dispatch-Optimization-Platform/ci.yml?branch=main&label=build)
+![Python Version](https://img.shields.io/badge/python-3.12-blue.svg)
+![License](https://img.shields.io/github/license/Matshiselan/End-to-End-SMARD-Forecasting-and-Dispatch-Optimization-Platform)
+![Docker](https://img.shields.io/badge/docker-ready-blue)
+![Code Style: Black](https://img.shields.io/badge/code%20style-black-000000.svg)
+![Requirements](https://img.shields.io/badge/requirements-up%20to%20date-brightgreen)
 
 # End-to-End SMARD Forecasting and Dispatch Optimization Platform
 
@@ -206,6 +213,3 @@ Contributions are welcome! Please open issues or submit pull requests for improv
 
 MIT License
 
----
-
-Let me know if you want to add badges, contact info, or further customization!
