@@ -21,7 +21,7 @@ def generate_local_report(total_expected, total_realized, realization_ratio, tot
     - Total Physical Energy Throughput: {total_mwh_cycled:,.2f} MWh
     """
     
-    print("🚀 Prompting HuggingFace Serverless Engine (Qwen2.5-7B-Instruct)...")
+    print("Prompting HuggingFace Serverless Engine (Qwen2.5-7B-Instruct)...")
     
     HF_TOKEN = os.getenv("HF_TOKEN")
     if not HF_TOKEN:
@@ -64,8 +64,8 @@ def generate_local_report(total_expected, total_realized, realization_ratio, tot
         report_content = completion.choices[0].message.content
         
     except Exception as e:
-        print(f"❌ API Call failed: {e}")
-        print("🔄 Deploying structural hard-coded template to prevent script crash...")
+        print(f"API Call failed: {e}")
+        print("Deploying structural hard-coded template to prevent script crash...")
         
         # Safe structural fallback to prevent empty file or garbage output loops
         report_content = f"""# BESS Commercialization Report (System Fallback Format)
@@ -86,7 +86,7 @@ The battery dispatch pipeline has successfully completed its 364-day backtest lo
     with open(output_filename, "w", encoding="utf-8") as f:
         f.write(report_content)
         
-    print(f"✨ Success! Your clean markdown report has been saved to: {output_filename}")
+    print(f"Success! Your clean markdown report has been saved to: {output_filename}")
     return report_content
 
 if __name__ == "__main__":
