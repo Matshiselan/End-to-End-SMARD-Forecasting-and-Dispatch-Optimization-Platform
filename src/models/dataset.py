@@ -1,62 +1,53 @@
+
 import numpy as np
 import pandas as pd
+from typing import Tuple, List, Optional
+from sklearn.model_selection import TimeSeriesSplit
 
-from sklearn.preprocessing import StandardScaler
+def prepare_modeling_matrices(
+	df: pd.DataFrame,
+	target: str = "price_de_lu",
+	exclude_cols: Optional[List[str]] = None
+) -> Tuple[pd.DataFrame, pd.Series]:
+	"""
+	Separates the processed dataframe into feature matrix X and target y.
+	Drops non-predictive variables and ensures only valid features are used.
 
-def build_direct_dataset(
-    df,
-    target,
-    horizon=96,
-    sequence_length=96
-):
+	Args:
+		df: Input DataFrame with all features and target.
+		target: Name of the target column.
+		exclude_cols: List of columns to exclude from X. If None, uses default list.
 
-    df = df.copy()
+	Returns:
+		X: Feature matrix (pd.DataFrame)
+		y: Target vector (pd.Series)
+	"""
+	if exclude_cols is None:
+		exclude_cols = [
+			"timestamp", target, "price_neighbors", "price_at",
+			"gen_nuclear", "gen_lignite", "gen_offshore_wind", "gen_hydro",
+			"gen_other_conv", "gen_other_renew", "gen_biomass", "gen_onshore_wind",
+			"gen_solar", "gen_hard_coal", "gen_pumped_storage", "gen_natural_gas",
+			"cons_total_grid", "cons_residual", "cons_pumped_storage",
+			"actual_renewables_total", "actual_fossil_total", "historical_renewable_penetration"
+		]
+	y = df[target].copy()
+	X = df.drop(columns=[col for col in exclude_cols if col in df.columns])
+	return X, y
 
-    feature_cols = [
-        c for c in df.columns
-        if c not in [
-            "timestamp"
-        ]
-    ]
+def get_time_series_splits(
+	X: pd.DataFrame,
+	n_splits: int = 5
+) -> List[Tuple[np.ndarray, np.ndarray]]:
+	"""
+	Utility to get time series cross-validation splits.
 
-    X_data = df[feature_cols].values
-    y_data = df[target].values
+	Args:
+		X: Feature matrix.
+		n_splits: Number of splits.
 
-    scaler = StandardScaler()
-
-    X_data = scaler.fit_transform(X_data)
-
-    X = []
-    Y = []
-    timestamps = []
-
-    for i in range(
-        sequence_length,
-        len(df)-horizon
-    ):
-
-        x = X_data[
-            i-sequence_length:i
-        ]
-
-        y = y_data[
-            i:i+horizon
-        ]
-
-        X.append(x)
-        Y.append(y)
-
-        timestamps.append(
-            df.iloc[i]["timestamp"]
-        )
-
-    X = np.array(X, dtype=np.float32)
-    Y = np.array(Y, dtype=np.float32)
-
-    return (
-        X,
-        Y,
-        timestamps,
-        scaler,
-        feature_cols
-    )
+	Returns:
+		List of (train_idx, val_idx) tuples for each fold.
+	"""
+	tscv = TimeSeriesSplit(n_splits=n_splits)
+	return list(tscv.split(X))

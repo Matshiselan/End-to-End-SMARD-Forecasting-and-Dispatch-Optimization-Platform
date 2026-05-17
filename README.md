@@ -8,174 +8,174 @@
 ![Code Style: Black](https://img.shields.io/badge/code%20style-black-000000.svg)
 ![Requirements](https://img.shields.io/badge/requirements-up%20to%20date-brightgreen)
 
+
 # End-to-End SMARD Forecasting and Dispatch Optimization Platform
 
-A comprehensive platform for modeling, forecasting, and optimizing German energy production, consumption, and market prices using SMARD data.
+An advanced, modular platform for end-to-end forecasting and dispatch optimization in the German energy market, leveraging SMARD data, state-of-the-art machine learning (LightGBM, XGBoost, LSTM with quantile outputs), robust feature engineering, and degradation-aware battery dispatch optimization.
+
 
 
 ## Overview
 
-End-to-End SMARD Forecasting and Dispatch Optimization Platform is a comprehensive solution for modeling, forecasting, and optimizing German energy production, consumption, and market prices using SMARD data. The platform supports data extraction, feature engineering, model training, evaluation, and dispatch optimization in a modular, reproducible environment.
+This platform provides a full pipeline for:
+- **Data extraction** from SMARD and storage in PostgreSQL
+- **Advanced feature engineering** (calendar, cyclical, lagged, rolling, domain-specific)
+- **Production-grade model training** (LightGBM, XGBoost, LSTM with probabilistic/quantile outputs)
+- **Model interpretability** (SHAP for tree and deep models)
+- **Robust evaluation and backtesting** (walk-forward validation, metrics, plots)
+- **Degradation-aware dispatch optimization** (MILP with battery cycling penalty)
+- **Reproducible, modular codebase** (scripts, notebooks, Docker)
+
 
 ## Folder Structure
 
 ```
 .
-├── docker-compose.yml         # Docker orchestration for services
+├── docker-compose.yml         # Docker orchestration for PostgreSQL
 ├── requirements.txt           # Python dependencies
 ├── README.md                  # Project documentation
-├── notebooks/                 # Jupyter notebooks for EDA and analysis
-│   └── eda.ipynb
-├── models/                    # Saved model artifacts
-│   ├── lgbm_gen_onshore_wind_96steps.pkl
-│   ├── lgbm_gen_solar_96steps.pkl
-│   └── lgbm_price_de_lu_96steps.pkl
-├── src/                       # Source code
-│   ├── config.py              # Configuration (DB, paths, etc.)
-│   ├── etl/                   # ETL scripts
-│   │   └── fetch_smard.py
-│   ├── models/                # Model training and feature engineering
-│   │   ├── train_lgbm.py
-│   │   ├── train_tft.py
-│   │   ├── features.py
-│   │   ├── backtest.py
-│   │   ├── evaluate.py
-│   │   ├── huggingface_transformer.py
-│   │   ├── lstm.py
-│   │   └── predict.py
-│   └── optimization/          # (Optional) Dispatch optimization scripts
-└── ...
+├── notebooks/                 # Jupyter notebooks (EDA, modelling)
+│   ├── eda.ipynb
+│   └── modelling.ipynb
+├── models/                    # Saved model artifacts (populated after training)
+├── src/
+│   ├── config.py              # Central configuration
+│   ├── etl/
+│   │   └── fetch_smard.py     # Data extraction from SMARD
+│   ├── models/
+│   │   ├── features.py        # Advanced feature engineering
+│   │   ├── dataset.py         # Robust dataset/target extraction, splits
+│   │   ├── train_lgbm.py      # LightGBM training (walk-forward)
+│   │   ├── train_xgb.py       # XGBoost training (walk-forward)
+│   │   ├── train_lstm.py      # LSTM (probabilistic/quantile) training
+│   │   ├── backtest.py        # (Optional) Backtesting utilities
+│   │   ├── evaluate.py        # (Optional) Evaluation utilities
+│   │   ├── predict.py         # Model inference
+│   └── optimization/
+│       └── dispatch_lp.py     # Degradation-aware dispatch optimization (MILP)
 ```
 
 
 ## Getting Started
 
 
+
 ### 1. Environment Setup
 
-- Clone the repository and navigate to the project root.
-- Install dependencies:
-  ```bash
-  pip install -r requirements.txt
-  ```
-- (Optional) Use Docker for a reproducible environment:
-  ```bash
-  docker-compose up
-  ```
+Clone the repository and navigate to the project root.
+
+Install dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+Or use Docker for a reproducible environment:
+```bash
+docker-compose up
+```
+
 
 
 ### 2. Database Setup
 
-- Ensure PostgreSQL is running (see docker-compose.yml or your local setup).
-- Connect to the database:
-  ```bash
-  psql -h localhost -U postgres -d energy_db
-  ```
-- Inspect tables:
-  ```
-  \dt
-  \d smard_market_data
-  ```
+Ensure PostgreSQL is running (see docker-compose.yml or your local setup).
+Connect to the database:
+```bash
+psql -h localhost -U postgres -d energy_db
+```
+Inspect tables:
+```
+\dt
+\d smard_market_data
+```
+
 
 ## Database Table Structure
 
-The main table `smard_market_data` includes:
+The main table `smard_market_data` includes (not exhaustive):
 
 | Column               | Type                      | Description                |
 |----------------------|--------------------------|----------------------------|
 | timestamp            | timestamp with time zone  | Data timestamp             |
-| gen_nuclear          | numeric(14,4)             | Nuclear generation         |
-| gen_lignite          | numeric(14,4)             | Lignite generation         |
+| gen_nuclear          | numeric                   | Nuclear generation         |
+| gen_lignite          | numeric                   | Lignite generation         |
 | ...                  | ...                       | ...                        |
-| price_de_lu          | numeric(14,4)             | German/Lux price           |
-| proj_onshore         | numeric(14,4)             | Forecast onshore wind      |
+| price_de_lu          | numeric                   | German/Lux price           |
+| proj_onshore         | numeric                   | Forecast onshore wind      |
 | ...                  | ...                       | ...                        |
+
 
 
 
 ### 3. Data Extraction (ETL)
 
-- Fetch and load SMARD data:
-  ```bash
-  python src/etl/fetch_smard.py
-  ```
-
-**Note:**
-By default, the data extraction script fetches data for the period **May 2020 to May 2025**. This is controlled by the following line in `src/etl/fetch_smard.py`:
-
-```python
-target_timestamps = [ts for ts in available_timestamps if 1588284000000 <= ts <= 1746057600000]
+Fetch and load SMARD data:
+```bash
+python src/etl/fetch_smard.py
 ```
+By default, the script fetches data for May 2020 to May 2025. Adjust the timestamp range in the script to change the period.
 
-You can adjust the date range by modifying the timestamp values in this line. The values represent milliseconds since epoch (Unix time). For other periods, update these values accordingly to fetch your desired date range.
 
 
 ### 4. Exploratory Data Analysis (EDA)
 
-- Open and run the EDA notebook:
-  ```
-  notebooks/eda.ipynb
-  ```
+Open and run the EDA notebook:
+```
+jupyter notebook notebooks/eda.ipynb
+```
 
 
 ---
+
 
 ## Feature Engineering
 
-Feature engineering is handled in `src/models/features.py` via the `create_features(df)` function. This script:
-
-- Extracts temporal features (hour, day of week, month, quarter-hour)
-- Flags weekends and German public holidays
+Feature engineering is handled in `src/models/features.py` via `create_day_ahead_features(df)`, which:
+- Extracts calendar, cyclical, and holiday features
 - Adds daylight saving time (DST) indicator
-- Creates cyclical features (sine/cosine transforms for hour, day, month)
-- Computes domain features (total renewable generation, residual load)
-- Adds lagged features and rolling statistics (mean, std) for key variables
-- Calculates ramp rates (short-term changes)
-- Handles missing values with forward fill
+- Computes domain features (renewable/fossil totals, penetration)
+- Adds lagged features (24h, 48h, 168h) and rolling stats (mean, std, volatility)
+- Calculates ramp rates and trends
+- Handles missing values robustly
 
-To customize or add features, edit `src/models/features.py`.
+Edit `src/models/features.py` to customize or extend features.
 
 ---
+
 
 ## Dataset Preparation
 
-The script `src/models/dataset.py` provides the `build_direct_dataset` function, which:
+`src/models/dataset.py` provides robust utilities:
+- `prepare_modeling_matrices`: Extracts feature matrix X and target y, drops non-predictive columns, ensures no leakage
+- `get_time_series_splits`: Walk-forward time series cross-validation splits
 
-- Selects features and target columns from the DataFrame
-- Scales features using `StandardScaler`
-- Constructs input sequences (X) and target sequences (Y) for time series models
-- Supports configurable sequence length and forecast horizon
-- Returns numpy arrays (float32) for efficient model training, along with timestamps and feature names
-
-This function is used by all model training scripts to prepare data for supervised learning.
+All model scripts use these functions for consistent, production-grade data handling.
 
 ---
 
-## Modeling & Testing
+
+## Modeling & Evaluation
 
 ### 1. Model Training
 
-- LightGBM:
+- **LightGBM** (walk-forward, multi-output):
   ```bash
   python -m src.models.train_lgbm
   ```
-- LSTM:
+- **XGBoost** (walk-forward):
   ```bash
-  python -m src.models.lstm
+  python -m src.models.train_xgb
   ```
-- Temporal Fusion Transformer (TFT):
+- **LSTM** (probabilistic/quantile, robust scaling):
   ```bash
-  python -m src.models.train_tft
-  ```
-- CNN:
-  ```bash
-  python -m src.models.train_cnn
+  python -m src.models.train_lstm
   ```
 
-Each script supports configuration of target variable, forecast horizon, and other hyperparameters. Edit the script or pass arguments as needed.
+All scripts support configuration of target, forecast horizon, and hyperparameters. Edit scripts or pass arguments as needed.
 
 
-### 2. Model Evaluation
+
+### 2. Model Evaluation & Backtesting
 
 - Evaluate model performance:
   ```bash
@@ -186,24 +186,26 @@ Each script supports configuration of target variable, forecast horizon, and oth
   python -m src.models.backtest
   ```
 
+### 3. Testing
 
-### 3. Prediction
-
-- Generate predictions using a trained model:
-  ```bash
-  python -m src.models.predict
-  ```
-
-
-### 4. Testing
-
-- Unit tests can be added under a `tests/` directory (not included by default).
-- To test individual modules, run them as scripts or use pytest:
+- Add unit tests under a `tests/` directory (not included by default).
+- To test individual modules:
   ```bash
   pytest src/models/features.py
   ```
 
 
+## Dispatch Optimization
+
+Degradation-aware battery dispatch optimization is implemented in `src/optimization/dispatch_lp.py`:
+- MILP-based daily walk-forward backtest
+- Incorporates cell degradation penalty (EUR/MWh cycled)
+- Supports scenario-based (quantile) price forecasts
+- Produces detailed ledger and operational plots
+
+See `notebooks/modelling.ipynb` for example usage and visualization.
+
+---
 
 ## Contributing
 
