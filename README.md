@@ -1,7 +1,6 @@
 
 ---
 <!-- Badges -->
-![Build Status](https://img.shields.io/github/actions/workflow/status/Matshiselan/End-to-End-SMARD-Forecasting-and-Dispatch-Optimization-Platform/ci.yml?branch=main&label=build)
 ![Python Version](https://img.shields.io/badge/python-3.12-blue.svg)
 ![License](https://img.shields.io/github/license/Matshiselan/End-to-End-SMARD-Forecasting-and-Dispatch-Optimization-Platform)
 ![Docker](https://img.shields.io/badge/docker-ready-blue)
@@ -31,28 +30,44 @@ This platform provides a full pipeline for:
 
 ```
 .
-├── docker-compose.yml         # Docker orchestration for PostgreSQL
-├── requirements.txt           # Python dependencies
-├── README.md                  # Project documentation
-├── notebooks/                 # Jupyter notebooks (EDA, modelling)
+End-to-End-SMARD-Forecasting-and-Dispatch-Optimization-Platform/
+├── BESS_Automated_Report.md
+├── docker-compose.yml
+├── LICENSE
+├── models/
+│   └── lstm_model.pth
+├── notebooks/
 │   ├── eda.ipynb
 │   └── modelling.ipynb
-├── models/                    # Saved model artifacts (populated after training)
+├── README.md
+├── requirements.txt
 ├── src/
-│   ├── config.py              # Central configuration
+│   ├── __pycache__/
+│   │   └── config.cpython-312.pyc
+│   ├── config.py
 │   ├── etl/
-│   │   └── fetch_smard.py     # Data extraction from SMARD
+│   │   └── fetch_smard.py
+│   ├── LLM/
+│   │   ├── __pycache__/
+│   │   │   └── ollama.cpython-312.pyc
+│   │   └── ollama.py
 │   ├── models/
-│   │   ├── features.py        # Advanced feature engineering
-│   │   ├── dataset.py         # Robust dataset/target extraction, splits
-│   │   ├── train_lgbm.py      # LightGBM training (walk-forward)
-│   │   ├── train_xgb.py       # XGBoost training (walk-forward)
-│   │   ├── train_lstm.py      # LSTM (probabilistic/quantile) training
-│   │   ├── backtest.py        # (Optional) Backtesting utilities
-│   │   ├── evaluate.py        # (Optional) Evaluation utilities
-│   │   ├── predict.py         # Model inference
+│   │   ├── __pycache__/
+│   │   │   ├── backtest.cpython-312.pyc
+│   │   │   ├── dataset.cpython-312.pyc
+│   │   │   ├── evaluate.cpython-312.pyc
+│   │   │   ├── features.cpython-312.pyc
+│   │   │   ├── train_cnn.cpython-312.pyc
+│   │   │   └── train_lgbm.cpython-312.pyc
+│   │   ├── dataset.py
+│   │   ├── datasets.py
+│   │   ├── features.py
+│   │   ├── train_lgbm.py
+│   │   ├── train_lstm.py
+│   │   └── train_xgb.py
 │   └── optimization/
-│       └── dispatch_lp.py     # Degradation-aware dispatch optimization (MILP)
+│       └── dispatch_lp.py
+└── tamp) AS latest_date 
 ```
 
 
