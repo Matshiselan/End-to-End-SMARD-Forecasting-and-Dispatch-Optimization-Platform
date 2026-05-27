@@ -81,6 +81,7 @@ target/
 # Jupyter Notebook
 .ipynb_checkpoints
 notebooks/modelling.ipynb
+notebooks/production_analysis.ipynb
 
 # IPython
 profile_default/
