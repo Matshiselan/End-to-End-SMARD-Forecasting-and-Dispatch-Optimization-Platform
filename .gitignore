@@ -85,7 +85,7 @@ notebooks/production_analysis.ipynb
 notebooks/dunkelflaute_modelling.ipynb
 
 # report
-report/
+report/*
 
 # IPython
 profile_default/
