@@ -82,6 +82,7 @@ target/
 .ipynb_checkpoints
 notebooks/modelling.ipynb
 notebooks/production_analysis.ipynb
+notebooks/dunkelflaute_modelling.ipynb
 
 # IPython
 profile_default/
