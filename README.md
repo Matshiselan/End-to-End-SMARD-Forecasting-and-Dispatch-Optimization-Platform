@@ -236,8 +236,10 @@ This model is governed by this DAG
 <img width="1919" height="1446" alt="DAG" src="https://github.com/user-attachments/assets/c2aea5ee-1254-4c4d-b9bb-70ed11d48bda" />
 
 You can run open and run the Causal Model notebook:
+
 ```
 jupyter notebook notebooks/causal_modelling.ipynb
+```
 
 ---
 
